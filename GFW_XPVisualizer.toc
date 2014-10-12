@@ -1,0 +1,19 @@
+## Interface: 50200
+## Version: 5.2
+## X-Revision: $Rev: 731 $
+## X-Date: $Date: 2011-05-15 16:17:22 -0700 (Sun, 15 May 2011) $
+## Author: Gazmik Fizzwidget
+## X-Website: http://fizzwidget.com/factionfriend
+## X-Appcast: http://fizzwidget.com/notes/factionfriend/feed
+## Title: Fizzwidget XPBar
+## Notes: Enhances the built-in XP bar.
+## X-Category: Interface Enhancements
+## SavedVariables: FXP_Config
+## SavedVariablesPerCharacter: FXP_LastLevelAlert
+## LoadManagers: AddonLoader
+## X-LoadOn-Hooks: ExpBar_Update
+## X-LoadOn-MainMenuExpBar_Update: LoadAddOn('GFW_XPBar')
+
+Localization.lua
+XPBar.lua
+XPBar.xml
