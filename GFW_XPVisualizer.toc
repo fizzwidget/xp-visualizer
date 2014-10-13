@@ -1,11 +1,9 @@
-## Interface: 50200
-## Version: 5.2
-## X-Revision: $Rev: 731 $
-## X-Date: $Date: 2011-05-15 16:17:22 -0700 (Sun, 15 May 2011) $
+## Interface: 60000
+## Version: 6.0
 ## Author: Gazmik Fizzwidget
 ## X-Website: http://fizzwidget.com/factionfriend
 ## X-Appcast: http://fizzwidget.com/notes/factionfriend/feed
-## Title: Fizzwidget XPBar
+## Title: Fizzwidget XP Visualizer
 ## Notes: Enhances the built-in XP bar.
 ## X-Category: Interface Enhancements
 ## SavedVariables: FXP_Config
