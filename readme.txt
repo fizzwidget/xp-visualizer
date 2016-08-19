@@ -23,6 +23,9 @@ FEATURES:
 ------------------------------------------------------
 VERSION HISTORY
 
+v. 7.0 - 2016/08/18
+- Updated TOC to indicate compatibility with WoW Patch 7.0.
+
 v. 6.0 - 2014/10/14
 - Updated TOC to indicate compatibility with WoW Patch 6.0.
 
