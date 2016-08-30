@@ -23,6 +23,9 @@ FEATURES:
 ------------------------------------------------------
 VERSION HISTORY
 
+v. 7.0.1 - 2016/08/30
+- Fixed an issue where incomplete quests were being counted as complete.
+
 v. 7.0 - 2016/08/18
 - Updated TOC to indicate compatibility with WoW Patch 7.0.
 
