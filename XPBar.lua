@@ -87,34 +87,31 @@ function FXP_UpdateQuestXP()
 	end
 	
 	local questIndex = 0;
-	local lastSelected = GetQuestLogSelection();
 	local playerMoney = GetMoney();
 	
 	repeat
 		-- not doing for loop to GetNumQuestLogEntries() because
 		-- stuff under collapsed headers gets indices higher than that
 		questIndex = questIndex + 1;
-		local questLogTitleText, level, questTag, suggestedGroup, isHeader, isCollapsed, isComplete, isDaily, questID, startEvent = GetQuestLogTitle(questIndex);
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory = GetQuestLogTitle(questIndex);
 		if (not isHeader) then
-			SelectQuestLogEntry(questIndex);
 			
 			-- muck with "complete" status the way builtin quest watch UI does
 			local requiredMoney = GetQuestLogRequiredMoney(questIndex);			
 			local numObjectives = GetNumQuestLeaderBoards(questIndex);
 			if ( isComplete and isComplete < 0 ) then
 				isComplete = false;	-- failed quest
-			elseif ( numObjectives == 0 and playerMoney >= requiredMoney ) then
+			elseif ( numObjectives == 0 and playerMoney >= requiredMoney and not startEvent) then
 				isComplete = true;	-- no objectives means "complete" (a la breadcrumb quest)
 			end
-			
+
 			if (isComplete) then
-				FXP_CompleteQuestsXP = FXP_CompleteQuestsXP + GetQuestLogRewardXP();
+				FXP_CompleteQuestsXP = FXP_CompleteQuestsXP + GetQuestLogRewardXP(questID);
 			elseif (FXP_Config.ShowIncomplete) then
-				FXP_IncompleteQuestsXP = FXP_IncompleteQuestsXP + GetQuestLogRewardXP();
+				FXP_IncompleteQuestsXP = FXP_IncompleteQuestsXP + GetQuestLogRewardXP(questID);
 			end
 		end
-	until (questLogTitleText == nil);
-	SelectQuestLogEntry(lastSelected);
+	until (title == nil);
 
 	local currXP = UnitXP("player");
 	local nextXP = UnitXPMax("player");
