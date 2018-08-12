@@ -23,6 +23,10 @@ FEATURES:
 ------------------------------------------------------
 VERSION HISTORY
 
+v. 8.0 - 2016/08/11
+- Updated for WoW Patch 8.0 and Battle for Azeroth.
+- The alert that appears when you have enough completed quests to reach the next level is now a simple chat message.
+
 v. 7.0.1 - 2016/08/30
 - Fixed an issue where incomplete quests were being counted as complete.
 
