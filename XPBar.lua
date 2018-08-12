@@ -7,12 +7,7 @@ FXP_Config = {
 FXP_LastLevelAlert = 1;
 
 function FXP_OnLoad(self)
-
-	hooksecurefunc("ExpBar_Update", FXP_MainMenuExpBar_Update);
-	hooksecurefunc("MainMenuExpBar_SetWidth", FXP_MainMenuExpBar_Update);
-	hooksecurefunc("ExhaustionToolTipText", FXP_Tooltip);
-	MainMenuExpBar:HookScript("OnMouseDown", FXP_ShowMenu);
-			
+	
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_LEAVING_WORLD");
 	self:RegisterEvent("ADDON_LOADED");
@@ -24,19 +19,23 @@ function FXP_OnLoad(self)
 	
 end
 
+function FXP_GetMainMenuBar()
+	for _, bar in pairs(StatusTrackingBarManager.bars) do
+		if bar.priority == 0 then
+			return bar
+		end
+	end
+end
+
 function FXP_OnEvent(self, event, arg1, arg2)
-	if ( event == "PLAYER_ENTERING_WORLD" or (event == "ADDON_LOADED" and arg1 == addonName)) then
+	if ( event == "PLAYER_ENTERING_WORLD" or (event == "ADDON_LOADED" and arg1 == addonName)) then		
 		self:RegisterEvent("QUEST_LOG_UPDATE");
 		self:RegisterEvent("PLAYER_XP_UPDATE");
 		self:RegisterEvent("UNIT_INVENTORY_CHANGED");	-- catch +XP heirlooms
-		self:RegisterEvent("PLAYER_LEVEL_UP");
 	elseif( event == "PLAYER_LEAVING_WORLD" ) then
 		self:UnregisterEvent("QUEST_LOG_UPDATE");
 		self:UnregisterEvent("PLAYER_XP_UPDATE");
 		self:UnregisterEvent("UNIT_INVENTORY_CHANGED");
-		self:UnregisterEvent("PLAYER_LEVEL_UP");
-	elseif( event == "PLAYER_LEVEL_UP" ) then
-		FXP_LevelAlert:Hide();
 	end
 	FXP_UpdateQuestXP();
 	FXP_MainMenuExpBar_Update();
@@ -128,21 +127,41 @@ end
 
 function FXP_MainMenuExpBar_Update()
 
+	local bar = FXP_GetMainMenuBar()
+	if bar == nil then
+		return
+	end
+	local statusBar = bar.StatusBar
+		
+	if FXP_XPExtraFillBar1 == nil then
+		FXP_XPExtraFillBar1 = CreateFrame("StatusBar", "FXP_XPExtraFillBar1", bar, "FXP_XPExtraFillBar1Template")
+		FXP_XPExtraFillBar1:SetAllPoints()
+		FXP_XPExtraFillBar1:SetFrameLevel(max(bar:GetFrameLevel(), 0));
+
+		FXP_XPExtraFillBar2 = CreateFrame("StatusBar", "FXP_XPExtraFillBar2", bar, "FXP_XPExtraFillBar2Template")
+		FXP_XPExtraFillBar2:SetAllPoints()
+		FXP_XPExtraFillBar2:SetFrameLevel(max(bar:GetFrameLevel() - 1, 0));
+		
+		-- first time seeing ExpBar means time to hook it
+		bar:HookScript("OnEnter", FXP_Tooltip)
+		bar:HookScript("OnMouseDown", FXP_ShowMenu)
+	end
+
 	if (not FXP_CompleteQuestsXP) then FXP_UpdateQuestXP(); end
 	
 	local currXP = UnitXP("player");
 	local nextXP = UnitXPMax("player");
-	local xpBarEnd = (currXP / nextXP) * MainMenuExpBar:GetWidth();
+	local xpBarEnd = (currXP / nextXP) * statusBar:GetWidth();
 
 	local color = {};
-	color.r, color.g, color.b = MainMenuExpBar:GetStatusBarColor();
+	color.r, color.g, color.b = statusBar:GetStatusBarColor();
 
 	-- TODO(?): break each bar in 2 parts so we can be blue up to exhaustion tick, purple after
 
 	local newXP = currXP + FXP_CompleteQuestsXP;
-	local completeBarEnd = (newXP / nextXP) * MainMenuExpBar:GetWidth();
+	local completeBarEnd = (newXP / nextXP) * statusBar:GetWidth();
 	completeBarEnd = math.max(completeBarEnd, 0);
-	completeBarEnd = math.min(completeBarEnd, MainMenuExpBar:GetWidth());
+	completeBarEnd = math.min(completeBarEnd, statusBar:GetWidth());
 	if (newXP == currXP) then
 	    FXP_XPExtraFillBar1Texture:Hide();
 	else
@@ -153,16 +172,16 @@ function FXP_MainMenuExpBar_Update()
 			color.a = 0.5;
 		end
 		
-		FXP_UpdateBar(FXP_XPExtraFillBar1Texture, xpBarEnd, completeBarEnd, color);		
+		FXP_UpdateBar(bar, FXP_XPExtraFillBar1Texture, xpBarEnd, completeBarEnd, color);		
 	end
 	
 	newXP = newXP + FXP_IncompleteQuestsXP;
 	if (newXP == currXP) then
 	    FXP_XPExtraFillBar2Texture:Hide();
 	else
-		local incompleteBarEnd = (newXP / nextXP) * MainMenuExpBar:GetWidth();
+		local incompleteBarEnd = (newXP / nextXP) * statusBar:GetWidth();
 		incompleteBarEnd = math.max(incompleteBarEnd, 0);
-		incompleteBarEnd = math.min(incompleteBarEnd, MainMenuExpBar:GetWidth());
+		incompleteBarEnd = math.min(incompleteBarEnd, statusBar:GetWidth());
 		if (newXP > nextXP) then 
 			color = ITEM_QUALITY_COLORS[2];
 			color.a = 0.4;
@@ -170,15 +189,15 @@ function FXP_MainMenuExpBar_Update()
 			color.a = 0.6;
 		end
 		
-		FXP_UpdateBar(FXP_XPExtraFillBar2Texture, completeBarEnd, incompleteBarEnd, color);		
+		FXP_UpdateBar(bar, FXP_XPExtraFillBar2Texture, completeBarEnd, incompleteBarEnd, color);		
 	end
 
 end
 
-function FXP_UpdateBar(barTexture, left, right, color)
+function FXP_UpdateBar(frame, barTexture, left, right, color)
 	barTexture:Show();
-    barTexture:SetPoint("TOPRIGHT", "MainMenuExpBar", "TOPLEFT", right, 0);
-    barTexture:SetPoint("TOPLEFT", "MainMenuExpBar", "TOPLEFT", left, 0);
+    barTexture:SetPoint("TOPRIGHT", frame, "TOPLEFT", right, 0);
+    barTexture:SetPoint("TOPLEFT", frame, "TOPLEFT", left, 0);
     barTexture:SetVertexColor(color.r, color.g, color.b, color.a);    
 end
 	
@@ -227,39 +246,14 @@ function FXP_NotifyLevelAvailable()
 	
 	if (not FXP_Config.LevelAlert) then return; end
 	
-	local nextLevel = UnitLevel("player") + 1;
+	local nextLevel = UnitLevel("player") + 1;	
 	if (nextLevel <= FXP_LastLevelAlert) then return; end
 	FXP_LastLevelAlert = nextLevel;
-	
+
 	local text = string.format(FXP_LEVEL_UP_FORMAT, nextLevel);
-	FXP_LevelAlertText:SetText(text);
-
-	-- adjust to fit on screen if needed
-	local left, bottom, width, height = FXP_LevelAlert:GetRect();
-	local diff = GetScreenWidth() - (left + width);
-	if (diff < 0) then
-		FXP_LevelAlert:SetPoint("BOTTOMRIGHT", FXP_XPExtraFillBar1Texture, "TOPRIGHT", diff+34, 16);
-	end
-	diff = GetScreenHeight() - (bottom + height);
-	if (diff < 0) then
-		FXP_LevelAlert:ClearAllPoints();
-		FXP_LevelAlert:SetPoint("TOPRIGHT", FXP_XPExtraFillBar1Texture, "BOTTOMRIGHT", 34, -16);
-		FXP_LevelAlert.ArrowUP:Hide();
-		FXP_LevelAlert.ArrowGlowUP:Hide();		
-		FXP_LevelAlert.ArrowDOWN:Show();
-		FXP_LevelAlert.ArrowGlowDOWN:Show();
-	else
-		FXP_LevelAlert.ArrowUP:Show();
-		FXP_LevelAlert.ArrowGlowUP:Show();		
-		FXP_LevelAlert.ArrowDOWN:Hide();
-		FXP_LevelAlert.ArrowGlowDOWN:Hide();
-	end
-
-	-- animate to show
-	FXP_LevelAlert.showAnim:Play();
-	FXP_LevelAlert:Show();
+	print(text)
 	
-	PlaySound("UI_AutoQuestComplete");	-- same as auto quest complete popup
+	PlaySound(SOUNDKIT.UI_AUTO_QUEST_COMPLETE);
 end
 
 ------------------------------------------------------
@@ -269,7 +263,7 @@ end
 function FXP_ShowMenu(self, button)
 	if (button == "RightButton") then
 		ToggleDropDownMenu(1, nil, FXP_MenuDropDown, "cursor", 0, 0, "TOP");
-		PlaySound("igMainMenuOptionCheckBoxOn");
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 	end
 end
 

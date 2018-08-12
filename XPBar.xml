@@ -12,15 +12,10 @@
 		</Scripts> 
 	</Frame> 
 
-	<StatusBar name="FXP_XPExtraFillBar1" parent="MainMenuExpBar" setAllPoints="true">
+	<StatusBar name="FXP_XPExtraFillBar1Template" virtual="true">
 		<BarTexture name="$parentTexture" file="Interface\TargetingFrame\UI-StatusBar"/>
-		<Scripts>
-			<OnLoad>
-				self:SetFrameLevel(max(MainMenuExpBar:GetFrameLevel(), 0));
-			</OnLoad>
-		</Scripts>
 	</StatusBar>
-	<Frame name="FXP_XPExtraFillBar2" parent="MainMenuExpBar" setAllPoints="true">
+	<Frame name="FXP_XPExtraFillBar2Template" virtual="true">
 		<Layers>
 			<Layer level="BORDER">
 				<Texture name="$parentTexture" hidden="true" setAllPoints="true">
@@ -28,103 +23,8 @@
 				</Texture>
 			</Layer>
 		</Layers>
-		<Scripts>
-			<OnLoad>
-				self:SetFrameLevel(max(MainMenuExpBar:GetFrameLevel() - 1, 0));
-			</OnLoad>
-		</Scripts>
 	</Frame>
-	
-	<Frame name="FXP_LevelAlert" inherits="GlowBoxTemplate" parent="UIParent" enableMouse="true" hidden="true" frameStrata="DIALOG" frameLevel="2">
-		<Size x="480" y="50"/>
-		<Anchors>
-			<Anchor point="BOTTOMRIGHT" relativeTo="FXP_XPExtraFillBar1Texture" relativePoint="TOPRIGHT" x="34" y="16"/>
-		</Anchors>
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString name="$parentText" inherits="GameFontHighlightLeft" justifyV="TOP">
-					<Anchors>
-						<Anchor point="TOPLEFT" x="9" y="-9"/>
-					</Anchors>
-				</FontString>
-			</Layer>
-			<Layer level="ARTWORK">
-				<Texture parentKey="ArrowUP" inherits="HelpPlateArrowDOWN" hidden="true">
-					<Size x="53" y="21"/>
-					<Anchors>
-						<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="-8" y="4"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="ArrowDOWN" inherits="HelpPlateArrowUP" hidden="true">
-					<Size x="53" y="21"/>
-					<Anchors>
-						<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" x="-8" y="-4"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="BORDER">
-				<Texture parentKey="ArrowGlowUP" inherits="HelpPlateArrow-GlowDOWN" hidden="true" alphaMode="ADD" alpha="0.5">
-					<Size x="53" y="21"/>
-					<Anchors>
-						<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="-8" y="4"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="ArrowGlowDOWN" inherits="HelpPlateArrow-GlowUP" hidden="true" alphaMode="ADD" alpha="0.5">
-					<Size x="53" y="21"/>
-					<Anchors>
-						<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" x="-8" y="-4"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="0"/>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-			</Button>
-			<!--
-			<Frame name="$parentArrow" inherits="GlowBoxArrowTemplate">
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="-8" y="4"/>
-				</Anchors>
-			</Frame>
-			-->
-		</Frames>
-		<Animations>
-			<AnimationGroup parentKey="showAnim">
-				<Alpha change="-1" duration="0" order="1"/>
-				<Alpha change="1" duration="1.0" order="2"/>
-				<Scripts>
-					<OnPlay>
-						local bg = _G[self:GetParent():GetName().."Bg"];
-						bg:SetTexture(0,0,0);
-					</OnPlay>
-					<OnFinished>
-						local bg = _G[self:GetParent():GetName().."Bg"];
-						bg:SetTexture(1,1,1);
-						bg:SetGradient("VERTICAL", 0.23,0.19,0, 0,0,0);
-					</OnFinished>
-				</Scripts>
-			</AnimationGroup>
-		</Animations>
-		<Scripts>
-			<OnShow>
-				local bg = _G[self:GetName().."Bg"];
-				bg:SetTexture(0,0,0);
-				bg:SetGradient("VERTICAL", 0.23,0.19,0, 0,0,0);
-				local text = _G[self:GetName().."Text"];
-				self:SetHeight(text:GetHeight()+18);
-				self:SetWidth(text:GetWidth()+49);
-			</OnShow>
-		</Scripts>
-	</Frame>
-	
+		
 	<Frame name="FXP_MenuDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
 		<Anchors>
 			<Anchor point="TOP">
